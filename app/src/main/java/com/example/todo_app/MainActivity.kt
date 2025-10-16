@@ -5,25 +5,36 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.todo_app.presentation.AuthViewModel
+import com.example.todo_app.presentation.MainScreen
+import com.example.todo_app.presentation.auth.AuthNavigation
+import com.example.todo_app.presentation.user.UserProfileScreen
+import com.example.todo_app.presentation.user.UserProfileViewModel
 import com.example.todo_app.ui.theme.Todo_appTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             Todo_appTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    TodoApp()
                 }
             }
         }
@@ -31,17 +42,53 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun TodoApp(
+    authViewModel: AuthViewModel = hiltViewModel()
+) {
+    val authState by authViewModel.authState.collectAsState()
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Todo_appTheme {
-        Greeting("Android")
+    NavHost(
+        navController = navController,
+        startDestination = if (authState.isLoggedIn) "main" else "auth"
+    ) {
+        composable("auth") {
+            AuthNavigation(
+                onAuthSuccess = {
+                    navController.navigate("main") {
+                        popUpTo("auth") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("main") {
+            MainScreen(
+                viewModel = authViewModel,
+                onNavigateToProfile = {
+                    navController.navigate("profile")
+                },
+                onLogout = {
+                    navController.navigate("auth") {
+                        popUpTo("main") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("profile") {
+            val userProfileViewModel: UserProfileViewModel = hiltViewModel()
+            UserProfileScreen(
+                viewModel = userProfileViewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onLogout = {
+                    navController.navigate("auth") {
+                        popUpTo("main") { inclusive = true }
+                    }
+                }
+            )
+        }
     }
 }
