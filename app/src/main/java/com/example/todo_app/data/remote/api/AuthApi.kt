@@ -14,5 +14,5 @@ interface AuthApi {
     suspend fun register(@Body request: RegisterRequest): RegisterResponse
 
     @GET("/user/v1/profile")
-    suspend fun getUserProfile(@Header("Authorization") token: String): UserProfileResponse
+    suspend fun getUserProfile(@Header("Authorization") authorization: String): UserProfileResponse
 }

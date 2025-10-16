@@ -150,6 +150,16 @@ fun UserProfileScreen(
                                 label = "Last Name",
                                 value = user.lastName ?: "N/A"
                             )
+                            
+                            ProfileField(
+                                label = "Phone",
+                                value = user.phone ?: "N/A"
+                            )
+                            
+                            ProfileField(
+                                label = "Gender",
+                                value = user.gender ?: "N/A"
+                            )
                         }
                     }
 
@@ -182,6 +192,16 @@ fun UserProfileScreen(
                             ProfileField(
                                 label = "Updated At",
                                 value = user.updatedAt ?: "N/A"
+                            )
+                            
+                            ProfileField(
+                                label = "System Role",
+                                value = user.systemRole ?: "N/A"
+                            )
+                            
+                            ProfileField(
+                                label = "Status",
+                                value = user.status ?: "N/A"
                             )
                         }
                     }

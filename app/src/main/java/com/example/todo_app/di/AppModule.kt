@@ -53,7 +53,10 @@ object AppModule {
     }
 
     @Provides
-    fun provideTodoRepository(api: TodoAPI): TodoRepository = TodoRepository(api)
+    fun provideTodoRepository(api: TodoAPI, tokenStorage: TokenStorage): TodoRepository = TodoRepository(
+        api,
+        tokenStorage
+    )
 
     @Provides
     fun provideTodoUseCases(repo: TodoRepository) = TodoUseCases(repo)

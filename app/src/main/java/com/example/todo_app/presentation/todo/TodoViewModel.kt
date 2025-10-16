@@ -80,6 +80,20 @@ class TodoViewModel @Inject constructor(
         }
     }
 
+    fun markDoing(id: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            try {
+                todoUseCases.markDoing(id)
+                loadTodos()
+            } catch (e: Exception) {
+                _error.value = e.message ?: "Failed to mark todo as doing"
+                _isLoading.value = false
+            }
+        }
+    }
+
     fun clearError() {
         _error.value = null
     }

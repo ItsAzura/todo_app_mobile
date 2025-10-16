@@ -95,7 +95,9 @@ fun TodoScreen(
                 items(todos) { todo ->
                     TodoItem(
                         title = todo.title,
+                        status = todo.status,
                         onDone = { viewModel.markDone(todo.id) },
+                        onDoing = { viewModel.markDoing(todo.id) },
                         onDelete = { viewModel.deleteTodo(todo.id) }
                     )
                 }
@@ -108,7 +110,9 @@ fun TodoScreen(
 @Composable
 fun TodoItem(
     title: String,
+    status: String,
     onDone: () -> Unit,
+    onDoing: () -> Unit,
     onDelete: () -> Unit
 ) {
     Card(
@@ -116,20 +120,60 @@ fun TodoItem(
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = when (status) {
+                "done" -> MaterialTheme.colorScheme.primaryContainer
+                "doing" -> MaterialTheme.colorScheme.secondaryContainer
+                else -> MaterialTheme.colorScheme.surfaceVariant
+            }
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .padding(12.dp)
         ) {
-            Text(title)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    style = if (status == "done") {
+                        MaterialTheme.typography.bodyLarge.copy(
+                            textDecoration = androidx.compose.ui.text.style.TextDecoration.LineThrough
+                        )
+                    } else {
+                        MaterialTheme.typography.bodyLarge
+                    }
+                )
+                Text(
+                    text = status.uppercase(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = when (status) {
+                        "done" -> MaterialTheme.colorScheme.onPrimaryContainer
+                        "doing" -> MaterialTheme.colorScheme.onSecondaryContainer
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
             Row {
-                TextButton(onClick = onDone) { Text("✅ Done") }
-                TextButton(onClick = onDelete) { Text("🗑 Delete") }
+                if (status != "done") {
+                    TextButton(onClick = onDone) { 
+                        Text("✅ Done") 
+                    }
+                }
+                if (status != "doing") {
+                    TextButton(onClick = onDoing) { 
+                        Text("🔄 Doing") 
+                    }
+                }
+                TextButton(onClick = onDelete) { 
+                    Text("🗑 Delete") 
+                }
             }
         }
     }

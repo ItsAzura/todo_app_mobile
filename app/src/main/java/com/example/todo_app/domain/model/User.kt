@@ -8,5 +8,10 @@ data class User(
     val lastName: String? = null,
     val createdAt: String? = null,
     val updatedAt: String? = null,
-    val expire: Long? = null
+    val expire: Long? = null,
+    val phone: String? = null,
+    val avatar: String? = null,
+    val gender: String? = null,
+    val systemRole: String? = null,
+    val status: String? = null
 )

@@ -15,10 +15,10 @@ class AuthRepositoryImpl @Inject constructor(
     
     override suspend fun login(email: String, password: String): User {
         val response = api.login(LoginRequest(email, password))
-        val token = response.access_token.token
-        val expire = response.access_token.expire
+        val token = response.data.access_token.token
+        val expireIn = response.data.access_token.expire_in
         tokenStorage.saveToken(token, email)
-        return User(token = token, email = email, expire = expire)
+        return User(token = token, email = email, expire = expireIn.toLong())
     }
 
     override suspend fun register(first: String, last: String, email: String, password: String): User {
@@ -47,14 +47,20 @@ class AuthRepositoryImpl @Inject constructor(
             ?: throw IllegalStateException("No token found. User not logged in.")
         
         val response = api.getUserProfile("Bearer $token")
+        val userData = response.data
         return User(
             token = token,
-            email = response.email,
-            id = response.id,
-            firstName = response.first_name,
-            lastName = response.last_name,
-            createdAt = response.created_at,
-            updatedAt = response.updated_at
+            email = userData.email,
+            id = userData.id,
+            firstName = userData.first_name,
+            lastName = userData.last_name,
+            createdAt = userData.created_at,
+            updatedAt = userData.updated_at,
+            phone = userData.phone,
+            avatar = userData.avatar,
+            gender = userData.gender,
+            systemRole = userData.system_role,
+            status = userData.status
         )
     }
 }
