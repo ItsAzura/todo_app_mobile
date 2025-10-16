@@ -17,6 +17,7 @@ fun TodoScreen(
 ) {
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
     var newTodo by remember { mutableStateOf("") }
 
     // 🔹 Tải dữ liệu khi mở màn hình (chỉ chạy 1 lần)
@@ -53,6 +54,36 @@ fun TodoScreen(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Hiển thị error nếu có
+        error?.let { errorMessage ->
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    TextButton(
+                        onClick = { viewModel.clearError() }
+                    ) {
+                        Text("Dismiss")
+                    }
+                }
+            }
+        }
 
         // Hiển thị loading hoặc danh sách
         if (isLoading) {

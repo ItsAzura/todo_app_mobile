@@ -1,43 +1,42 @@
 package com.example.todo_app.data.repository
 
+import com.example.todo_app.data.local.TokenStorage
 import com.example.todo_app.data.remote.api.TodoAPI
 import com.example.todo_app.data.remote.dto.TodoResponse
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
-class TodoRepository() {
+class TodoRepository @Inject constructor(
+    private val api: TodoAPI,
+    private val tokenStorage: TokenStorage
+) {
 
-    private val api: TodoAPI
-
-    init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.0.33:8080/") // 👈 base URL của bạn
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        api = retrofit.create(TodoAPI::class.java)
+    private suspend fun getAuthToken(): String {
+        val token = tokenStorage.getTokenSync()
+            ?: throw IllegalStateException("No token found. User not logged in.")
+        return "Bearer $token"
     }
 
     suspend fun getTodos(): List<TodoResponse> {
-        return api.getTodos()
+        return api.getTodos(getAuthToken())
     }
 
     suspend fun createTodo(title: String) {
-        api.createTodo(mapOf("title" to title))
+        api.createTodo(getAuthToken(), mapOf("title" to title))
     }
 
     suspend fun updateTodo(id: String, title: String) {
-        api.updateTodo(id, mapOf("title" to title))
+        api.updateTodo(getAuthToken(), id, mapOf("title" to title))
     }
 
     suspend fun deleteTodo(id: String) {
-        api.deleteTodo(id)
+        api.deleteTodo(getAuthToken(), id)
     }
 
     suspend fun markTodoDone(id: String) {
-        api.markTodoDone(id)
+        api.markTodoDone(getAuthToken(), id)
     }
+    
     suspend fun markTodoDoing(id: String) {
-        api.markTodoDoing(id)
+        api.markTodoDoing(getAuthToken(), id)
     }
 }

@@ -2,10 +2,13 @@ package com.example.todo_app.di
 
 import com.example.todo_app.data.local.TokenStorage
 import com.example.todo_app.data.remote.api.AuthApi
+import com.example.todo_app.data.remote.api.TodoAPI
 import com.example.todo_app.data.repository.AuthRepositoryImpl
+import com.example.todo_app.data.repository.TodoRepository
 import com.example.todo_app.domain.repository.AuthRepository
 import com.example.todo_app.domain.usecase.LoginUseCase
 import com.example.todo_app.domain.usecase.RegisterUseCase
+import com.example.todo_app.domain.usecase.TodoUseCases
 import com.example.todo_app.domain.usecase.UserProfileUseCase
 import dagger.Module
 import dagger.Provides
@@ -39,4 +42,19 @@ object AppModule {
 
     @Provides
     fun provideUserProfileUseCase(repo: AuthRepository) = UserProfileUseCase(repo)
+
+    @Provides
+    fun provideTodoAPI(): TodoAPI {
+        return Retrofit.Builder()
+            .baseUrl("http://10.0.0.33:8080")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(TodoAPI::class.java)
+    }
+
+    @Provides
+    fun provideTodoRepository(api: TodoAPI): TodoRepository = TodoRepository(api)
+
+    @Provides
+    fun provideTodoUseCases(repo: TodoRepository) = TodoUseCases(repo)
 }

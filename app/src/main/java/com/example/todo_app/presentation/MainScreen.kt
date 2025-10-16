@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 fun MainScreen(
     viewModel: AuthViewModel,
     onNavigateToProfile: () -> Unit,
+    onNavigateToTodos: () -> Unit,
     onLogout: () -> Unit
 ) {
     val authState by viewModel.authState.collectAsState()
@@ -56,6 +57,15 @@ fun MainScreen(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onNavigateToTodos,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+        ) {
+            Text("My Todos")
+        }
 
         Button(
             onClick = onNavigateToProfile,

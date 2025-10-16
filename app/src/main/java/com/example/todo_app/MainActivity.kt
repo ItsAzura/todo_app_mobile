@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.todo_app.presentation.AuthViewModel
 import com.example.todo_app.presentation.MainScreen
 import com.example.todo_app.presentation.auth.AuthNavigation
+import com.example.todo_app.presentation.todo.TodoScreen
 import com.example.todo_app.presentation.user.UserProfileScreen
 import com.example.todo_app.presentation.user.UserProfileViewModel
 import com.example.todo_app.ui.theme.Todo_appTheme
@@ -66,6 +67,9 @@ fun TodoApp(
         composable("main") {
             MainScreen(
                 viewModel = authViewModel,
+                onNavigateToTodos = {
+                    navController.navigate("todos")
+                },
                 onNavigateToProfile = {
                     navController.navigate("profile")
                 },
@@ -75,6 +79,10 @@ fun TodoApp(
                     }
                 }
             )
+        }
+
+        composable("todos") {
+            TodoScreen()
         }
 
         composable("profile") {
